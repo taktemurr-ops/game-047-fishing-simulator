@@ -51,6 +51,7 @@ namespace GameStudio.Fishing
     public sealed class FishingPrototype : MonoBehaviour
     {
         public FishingSession Session = new FishingSession();
+        private bool _touchReelHeld;
         void Update()
         {
             if (Input.GetKeyDown(KeyCode.Space))
@@ -58,11 +59,17 @@ namespace GameStudio.Fishing
                 if (Session.State == FishingState.Casting) Session.Hook();
                 else Session.Cast();
             }
-            Session.Tick(Input.GetKey(KeyCode.Return), Time.deltaTime);
+            Session.Tick(Input.GetKey(KeyCode.Return) || _touchReelHeld, Time.deltaTime);
         }
         void OnGUI()
         {
-            GUILayout.Label("Fishing prototype: Space = cast/hook, Enter = reel");
+            GUILayout.Label("Fishing prototype: touch controls or keyboard");
+            if (GUILayout.Button(Session.State == FishingState.Casting ? "Hook" : "Cast", GUILayout.Height(55)))
+            {
+                if (Session.State == FishingState.Casting) Session.Hook();
+                else Session.Cast();
+            }
+            _touchReelHeld = GUILayout.RepeatButton("Hold to reel", GUILayout.Height(65));
             GUILayout.Label("State: " + Session.State + "  Catches: " + Session.Catches);
             GUILayout.Label("Tension: " + Session.Tension.ToString("F2") +
                             " Progress: " + Session.Progress.ToString("F2"));
