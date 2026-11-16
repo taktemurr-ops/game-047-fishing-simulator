@@ -47,9 +47,9 @@ namespace GameStudio.Fishing
         /// <param name="dt">Elapsed seconds, must be nonnegative.</param>
         public void Tick(bool reel, float dt)
         {
-            if (State != FishingState.Hooked) return;
             if (dt < 0 || float.IsNaN(dt) || float.IsInfinity(dt))
                 throw new ArgumentOutOfRangeException(nameof(dt));
+            if (State != FishingState.Hooked) return;
             TimeRemaining = Mathf.Max(0, TimeRemaining - dt);
             Tension = Mathf.Clamp01(Tension + (reel ? .11f : -.22f) * dt);
             if (reel && Tension < .95f)
