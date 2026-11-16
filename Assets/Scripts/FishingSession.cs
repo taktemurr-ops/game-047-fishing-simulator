@@ -40,9 +40,9 @@ namespace GameStudio.Fishing
             if (dt < 0 || float.IsNaN(dt) || float.IsInfinity(dt))
                 throw new ArgumentOutOfRangeException(nameof(dt));
             TimeRemaining = Mathf.Max(0, TimeRemaining - dt);
-            Tension = Mathf.Clamp01(Tension + (reel ? .18f : -.22f) * dt);
+            Tension = Mathf.Clamp01(Tension + (reel ? .11f : -.22f) * dt);
             if (reel && Tension < .95f)
-                Progress = Mathf.Clamp01(Progress + .15f * dt);
+                Progress = Mathf.Clamp01(Progress + .18f * dt);
             if (Tension >= 1f || TimeRemaining <= 0f) State = FishingState.Escaped;
             else if (Progress >= 1f) { State = FishingState.Landed; Catches++; }
         }
