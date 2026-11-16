@@ -37,4 +37,35 @@ public class FishingSessionTests
         var s = new FishingSession(); s.Cast(); s.Hook(); s.Tick(false, 31f);
         Assert.AreEqual(FishingState.Escaped, s.State);
     }
+    [Test] public void CatchPaysCoinsAndUpgradeCostsCoins()
+    {
+        var s = new FishingSession();
+        for (var fish = 0; fish < 2; fish++)
+        {
+            s.Cast();
+            Assert.IsTrue(s.Hook());
+            for (var i = 0; i < 6; i++) s.Tick(true, 1f);
+            Assert.AreEqual(FishingState.Landed, s.State);
+        }
+        Assert.AreEqual(50, s.Coins);
+        Assert.IsTrue(s.UpgradeReel());
+        Assert.AreEqual(2, s.ReelLevel);
+        Assert.AreEqual(0, s.Coins);
+        Assert.IsFalse(s.UpgradeReel());
+    }
+
+    [Test] public void ReelUpgradeIncreasesProgressPerSecond()
+    {
+        var basic = new FishingSession();
+        basic.Cast(); basic.Hook(); basic.Tick(true, 1f);
+        var upgraded = new FishingSession();
+        for (var fish = 0; fish < 2; fish++)
+        {
+            upgraded.Cast(); upgraded.Hook();
+            for (var i = 0; i < 6; i++) upgraded.Tick(true, 1f);
+        }
+        Assert.IsTrue(upgraded.UpgradeReel());
+        upgraded.Cast(); upgraded.Hook(); upgraded.Tick(true, 1f);
+        Assert.Greater(upgraded.Progress, basic.Progress);
+    }
 }
