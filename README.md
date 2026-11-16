@@ -24,3 +24,7 @@ For Unity, create/open a compatible Unity project, install Unity Test Framework,
 - Android and iOS release builds and store verification
 
 This is an original prototype, NOT a finished production game.
+
+## Recent iteration
+- Adjusted reeling balance so ordinary continuous reeling can land a fish before line tension maxes out.
+- Added EditMode tests covering a full catch and next cast.
