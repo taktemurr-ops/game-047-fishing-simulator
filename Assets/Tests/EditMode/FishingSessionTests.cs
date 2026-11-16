@@ -68,4 +68,10 @@ public class FishingSessionTests
         upgraded.Cast(); upgraded.Hook(); upgraded.Tick(true, 1f);
         Assert.Greater(upgraded.Progress, basic.Progress);
     }
+    [Test] public void InvalidTimeIsRejectedEvenBeforeHooking()
+    {
+        var s = new FishingSession();
+        Assert.Throws<System.ArgumentOutOfRangeException>(() => s.Tick(false, float.NaN));
+        Assert.AreEqual(FishingState.Ready, s.State);
+    }
 }
