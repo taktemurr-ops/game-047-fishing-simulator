@@ -14,6 +14,17 @@ namespace GameStudio.Fishing
         public float Progress { get; private set; }
         public float TimeRemaining { get; private set; }
         public int Catches { get; private set; }
+        public int Coins { get; private set; }
+        public int ReelLevel { get; private set; } = 1;
+        public int ReelUpgradeCost => ReelLevel * 50;
+
+        public bool UpgradeReel()
+        {
+            if (ReelLevel >= 5 || Coins < ReelUpgradeCost) return false;
+            Coins -= ReelUpgradeCost;
+            ReelLevel++;
+            return true;
+        }
 
         public void Cast()
         {
@@ -42,9 +53,9 @@ namespace GameStudio.Fishing
             TimeRemaining = Mathf.Max(0, TimeRemaining - dt);
             Tension = Mathf.Clamp01(Tension + (reel ? .11f : -.22f) * dt);
             if (reel && Tension < .95f)
-                Progress = Mathf.Clamp01(Progress + .18f * dt);
+                Progress = Mathf.Clamp01(Progress + (.18f + (ReelLevel - 1) * .025f) * dt);
             if (Tension >= 1f || TimeRemaining <= 0f) State = FishingState.Escaped;
-            else if (Progress >= 1f) { State = FishingState.Landed; Catches++; }
+            else if (Progress >= 1f) { State = FishingState.Landed; Catches++; Coins += 25; }
         }
     }
 
@@ -71,6 +82,9 @@ namespace GameStudio.Fishing
             }
             _touchReelHeld = GUILayout.RepeatButton("Hold to reel", GUILayout.Height(65));
             GUILayout.Label("State: " + Session.State + "  Catches: " + Session.Catches);
+            GUILayout.Label("Coins: " + Session.Coins + "  Reel level: " + Session.ReelLevel);
+            if (GUILayout.Button("Upgrade reel (" + Session.ReelUpgradeCost + " coins)", GUILayout.Height(50)))
+                Session.UpgradeReel();
             GUILayout.Label("Tension: " + Session.Tension.ToString("F2") +
                             " Progress: " + Session.Progress.ToString("F2"));
         }
