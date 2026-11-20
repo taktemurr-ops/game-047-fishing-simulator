@@ -1,30 +1,58 @@
-# Fishing Simulator
+# Balıkçılık Simülatörü · Fishing Simulator
 
-Game Studio 100 | Android + iOS | Unity C# | **prototype in progress**
+**Game Studio 100 · #047 · Simülasyon** · Flutter · Android · iOS · Web
 
-## Current implemented source
+Oltayı at, balığı tak, günün avını çek!
 
-cast/hook/reel state machine, time and tension constraints, landing/escape, catch scoring, keyboard prototype.
+## Oyun
 
-- Gameplay implementation: `Assets/Scripts/FishingSession.cs`
-- Unit/EditMode test source: `Assets/Tests/EditMode/FishingSessionTests.cs`
-- Unity MonoBehaviour prototype with minimal OnGUI or keyboard controls
-- Gameplay and EditMode test assembly definitions included.
- 
-**Verification status:** source and test cases are committed, but compilation, test execution,
-device builds and complete gameplay verification have NOT been performed.
-For Unity, create/open a compatible Unity project, install Unity Test Framework, and attach the prototype MonoBehaviour to an active GameObject in a scene. A complete Unity project, scene assets and store-ready packages are not yet provided.
+Teknenle balıkların peşine düş; oltayı parmağınla istediğin derinliğe indir, balık takılınca bırak ve çek.
 
-## Remaining development
+- Paylaşılan deterministik oyun motoru (60 Hz), kayıtlı girdilerle kaldığı yerden devam
+- 5 balık türü (hamsi, çipura, levrek, orkinos, altın balık) ve hurdalar
+- **Mekanikler:** köpekbalığı (misinayı keser), denizanası (balığı kaçırır), akıntı, gece avı, hurda
+- Her bölümün ağırlık hedefi otomatik pilotun avına göre ayarlanır ve doğrulanır (çözülebilirlik garantisi)
+- Sakin deniz güçlendirmesi; ödüllü reklamla +20 sn
 
-- Game design research: supported competitor feature matrix and user experience improvements
-- Full playable levels, UI/UX polish, audio, animations, save/resume and accessibility
-- Multiple modes, progression, difficulty and content tooling
-- Device testing, CI, privacy permissions and compliant ads/in-app purchases
-- Android and iOS release builds and store verification
+## Bütün oyunlarda ortak sistemler
 
-This is an original prototype, NOT a finished production game.
+| Sistem | Durum | Dosya |
+|---|---|---|
+| 50.000 bölüm + sonsuz bölüm (seed ile deterministik, her bölüm çözülebilirlik testinden geçer) | ✅ | `lib/core/level_plan.dart`, `lib/game/rules.dart` |
+| 500 dünya, her 10 bölümde zorluk, her 50 bölümde yeni mekanik kombinasyonu, her 100 bölümde tema, her 1000 bölümde özel ödül | ✅ | `lib/core/level_plan.dart` |
+| Oyuncu performansına göre zorluk ayarı | ✅ | `AdaptiveDifficulty` |
+| Modlar: Macera, Sonsuz, Zamana karşı, Zen, Günün bölümü, Haftanın bölümü, 150 meydan okuma | ✅ | `lib/app/screens/home.dart` |
+| Günlük giriş ödülü (7 günlük döngü), seri, şans çarkı, günlük sürpriz, geri dönen oyuncu ödülü | ✅ | `lib/core/daily.dart` |
+| 4 günlük + 7 haftalık görev (tarihe göre otomatik yenilenir), günlük rekor, haftalık kişisel hedef | ✅ | `lib/core/missions.dart` |
+| 200+ başarım (50+ gizli) | ✅ | `lib/core/achievements.dart` |
+| Oyuncu seviyesi 1-500, 5 kademe (Başlangıç → Efsane) | ✅ | `lib/core/progression.dart` |
+| 236 koleksiyon parçası: tema, görünüm, rozet, avatar, çerçeve, efekt | ✅ | `lib/core/collection.dart` |
+| İnternetsiz oyun, otomatik kayıt, 3 yedek + yarım kalan yazmayı kurtarma, checksum, sürüm geçişi, yedek kodu ile dışa/içe aktarma | ✅ | `lib/core/save_store.dart`, `lib/core/save_data.dart` |
+| Uygulama kapanınca bölüme kaldığı yerden devam | ✅ | `resume` |
+| Saat manipülasyonu koruması | ✅ | `lib/core/clock.dart` |
+| Çökme döngüsü algılama → güvenli mod, hata günlüğü, performans ölçümü | ✅ | `lib/core/telemetry.dart` |
+| Acil durum yapılandırması (reklam/satın alma/analitik kapatma) | ✅ | `assets/config/emergency.json` |
+| İzinli, çevrimdışı kuyruklu analitik | ✅ | `AnalyticsQueue` |
+| AdMob: ödüllü + geçiş reklamı, sıklık sınırı, UMP/GDPR rızası, yaş kontrolü | ✅ (test kimlikleri) | `lib/app/services/ads_mobile.dart` |
+| Satın alma: reklamsız, premium, altın, ipucu, başlangıç paketi; doğrulama, geri yükleme, iade, tekrar koruması | ✅ (ürünler mağazada açılmalı) | `lib/core/monetization.dart` |
+| 5 dil (TR, EN, DE, ES, FR), renk körü modu, animasyon azaltma, yazı boyutu, solak düzen, titreşim | ✅ | `lib/core/strings.dart`, Ayarlar |
+| Özgün ikon, splash, ses efektleri, müzik, mağaza görselleri (kodla üretilir) | ✅ | `tool/generate_assets.py` |
+| CI: analiz, testler, APK + AAB, Web; iOS (manuel); haftalık 10.000 bölüm + 24 ay simülasyonu | ✅ | `.github/workflows/` |
 
-## Recent iteration
-- Adjusted reeling balance so ordinary continuous reeling can land a fish before line tension maxes out.
-- Added EditMode tests covering a full catch and next cast.
+## Çalıştırma
+
+```bash
+pip install pillow && python tool/generate_assets.py   # ikon, splash, ses, mağaza görselleri
+flutter create --platforms=android,ios,web --org com.gamestudio100 --project-name game_047_fishing_simulator .
+python tool/patch_platforms.py                         # AdMob id, izinler, uygulama adı
+flutter pub get
+dart run flutter_launcher_icons && dart run flutter_native_splash:create
+flutter test
+flutter run                                            # veya: flutter run -d chrome
+```
+
+Uzun testler: `flutter test --dart-define=LONG=true test/long_run_test.dart test/soak_test.dart`
+
+## Yayın öncesi yapılacaklar
+
+`docs/RELEASE.md` dosyasına bak: AdMob kimlikleri, mağaza ürünleri, imzalama anahtarları, gizlilik politikası adresi.
