@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:game_047_fishing_simulator/core/arcade.dart';
-import 'package:game_047_fishing_simulator/core/level_plan.dart';
+import 'package:studio_core/core/arcade.dart';
+import 'package:studio_core/core/level_plan.dart';
 import 'package:game_047_fishing_simulator/game/fish_engine.dart';
 import 'package:game_047_fishing_simulator/game/rules.dart';
 
